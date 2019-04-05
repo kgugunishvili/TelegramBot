@@ -7,8 +7,9 @@ class Record:
         self.conn = sqlite3.connect(self.file, check_same_thread=False)
         self.cursor = self.conn.cursor()
 
+
     def create_table(self,
-                     name,
+                     user_id,
                      fields: list ):
         query = "CREATE TABLE IF NOT EXISTS user{0} ("
 
@@ -21,12 +22,13 @@ class Record:
 
         query = query[:-2]
         query = query + ")"
-        query = query.format(name)
+        query = query.format(user_id)
 
         self.cursor.execute(query)
         self.conn.commit()
 
-    def add_record(self, name, data: list):
+
+    def add_record(self, user_id, data: list):
         # data might look like = ["+4179212245", 15]
         query = "INSERT INTO user{0} VALUES ("
 
@@ -39,7 +41,16 @@ class Record:
         query = query[:-2]
         query = query + ")"
         # query = "ÏNSERT INTO {0} ('+4179212245', 15)"
-        query = query.format(name)
-        
+        query = query.format(user_id)
+
         self.cursor.execute(query)
         self.conn.commit()
+
+
+    def list_all(self, user_id: int):
+        query = 'SELECT * FROM user{0}'.format(user_id)
+        self.cursor.execute(query)
+        data = cursor.fetchall()
+        self.conn.commit()
+
+        return data

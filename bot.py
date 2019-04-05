@@ -19,7 +19,7 @@ def send_add(message):
     data = message.text.split()[1:]
     data_ready = []
     # data might look like: ['24135135', '-', 'Komron']
-    
+
     for element in data:
         if not element == '-':
             data_ready.append(element)
@@ -28,6 +28,9 @@ def send_add(message):
     database.add_record(message.chat.id, data=data_ready)
     bot.send_message(message.chat.id, "Successful entry of data.")
 
+@bot.message_handler(commands=['list'])
+def list(message):
+    pass
 
 
 bot.polling()
