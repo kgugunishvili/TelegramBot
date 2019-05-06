@@ -50,7 +50,7 @@ class Record:
     def list_all(self, user_id: int):
         query = 'SELECT * FROM user{0}'.format(user_id)
         self.cursor.execute(query)
-        data = cursor.fetchall()
+        data = self.cursor.fetchall()
         self.conn.commit()
 
         return data

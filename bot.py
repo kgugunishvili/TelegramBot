@@ -28,9 +28,18 @@ def send_add(message):
     database.add_record(message.chat.id, data=data_ready)
     bot.send_message(message.chat.id, "Successful entry of data.")
 
+
 @bot.message_handler(commands=['list'])
 def list(message):
-    pass
+    uid = message.chat.id
+    info_list = database.list_all(user_id=uid)
+
+    if len(info_list) == 0:
+        bot.send_message(uid, "Sorry, you didn't enter any contacts")
+    else:
+        
+        bot.send_message(uid, info)
+
 
 
 bot.polling()
