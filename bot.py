@@ -14,6 +14,8 @@ def setup(message):
 
 @bot.message_handler(commands=['add'])
 def send_add(message):
+    uid = message.chat.id
+    database.create_table(user_id=uid, fields=FIELDS)
     # message.text might look like: /add 24135135 - Komron
     # by default seperates by spaces
     data = message.text.split()[1:]
@@ -24,22 +26,33 @@ def send_add(message):
         if not element == '-':
             data_ready.append(element)
 
+    if len(data_ready) != 2:
+        bot.send_message(uid, "Data entered incorrectly!")
+        return
+
     # now data might look like: ['24135135', 'Komron']
-    database.add_record(message.chat.id, data=data_ready)
-    bot.send_message(message.chat.id, "Successful entry of data.")
+    database.add_record(uid, data=data_ready)
+    bot.send_message(uid, "Successful entry of data.")
 
 
 @bot.message_handler(commands=['list'])
 def list(message):
     uid = message.chat.id
+    database.create_table(user_id=uid, fields=FIELDS)
     info_list = database.list_all(user_id=uid)
 
     if len(info_list) == 0:
         bot.send_message(uid, "Sorry, you didn't enter any contacts")
     else:
-        
+        info = ''
+        for element in info_list:
+            info += element[1] + ': ' + element[0] + '\n'
         bot.send_message(uid, info)
 
+
+@bot.message_handler(commands=['search'])
+def search(message):
+    demand = message.text.split()[1]
 
 
 bot.polling()

@@ -42,7 +42,6 @@ class Record:
         query = query + ")"
         # query = "ÏNSERT INTO {0} ('+4179212245', 15)"
         query = query.format(user_id)
-
         self.cursor.execute(query)
         self.conn.commit()
 
@@ -54,3 +53,6 @@ class Record:
         self.conn.commit()
 
         return data
+
+    def search(self, user_id, demand):
+        pass
