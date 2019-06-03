@@ -11,7 +11,7 @@ class Record:
     def create_table(self,
                      user_id,
                      fields: list ):
-        query = "CREATE TABLE IF NOT EXISTS user{0} ("
+        query = f"CREATE TABLE IF NOT EXISTS user{user_id} ("
 
         # name might be user123
         # fields = [["Phone","TEXT"], [Age, "ÏNTEGER"]]
@@ -22,7 +22,6 @@ class Record:
 
         query = query[:-2]
         query = query + ")"
-        query = query.format(user_id)
 
         self.cursor.execute(query)
         self.conn.commit()
@@ -30,7 +29,7 @@ class Record:
 
     def add_record(self, user_id, data: list):
         # data might look like = ["+4179212245", 15]
-        query = "INSERT INTO user{0} VALUES ("
+        query = f"INSERT INTO user{user_id} VALUES ("
 
         for value in data:
             if type(value) == str:
@@ -40,19 +39,23 @@ class Record:
 
         query = query[:-2]
         query = query + ")"
-        # query = "ÏNSERT INTO {0} ('+4179212245', 15)"
-        query = query.format(user_id)
+        # query = "INSERT INTO {0} ('+4179212245', 15)"
         self.cursor.execute(query)
         self.conn.commit()
 
 
     def list_all(self, user_id: int):
-        query = 'SELECT * FROM user{0}'.format(user_id)
+        query = f'SELECT * FROM user{user_id}'
         self.cursor.execute(query)
         data = self.cursor.fetchall()
         self.conn.commit()
 
         return data
 
+
     def search(self, user_id, demand):
-        pass
+        query = f"SELECT Phones FROM user{user_id} WHERE Names='{demand}'"
+        self.cursor.execute(query)
+        data = self.cursor.fetchall()
+
+        return data

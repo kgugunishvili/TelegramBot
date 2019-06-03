@@ -1,7 +1,14 @@
-import telebot
+import string
+
 import config
 import db_handler
+from utilities import check_addition
 
+import telebot
+
+
+ALLOWED_PHONE_CHARS = list(string.digits) + ['#', '-', '+']
+ALLOWED_NAME_CHARS = list(string.ascii_letters) + [' ']
 FIELDS = [['Phones', 'TEXT'], ['Names', 'TEXT']]
 
 bot = telebot.TeleBot(token=config.token)
@@ -12,13 +19,14 @@ def setup(message):
     bot.send_message(message.chat.id, "How nice to see you!")
     database.create_table(message.chat.id, fields=FIELDS)
 
+
 @bot.message_handler(commands=['add'])
 def send_add(message):
     uid = message.chat.id
     database.create_table(user_id=uid, fields=FIELDS)
-    # message.text might look like: /add 24135135 - Komron
+    # message.text might look like: "/add 24135135 - Komron"
     # by default seperates by spaces
-    data = message.text.split()[1:]
+    data = message.text.split(maxsplit=3)[1:]
     data_ready = []
     # data might look like: ['24135135', '-', 'Komron']
 
@@ -28,6 +36,14 @@ def send_add(message):
 
     if len(data_ready) != 2:
         bot.send_message(uid, "Data entered incorrectly!")
+        return
+    # phone number contains only: numbers, #, +, -
+    if not check_addition(data_ready[0], ALLOWED_PHONE_CHARS):
+        bot.send_message(uid, "Error! You can only enter numbers and symbols: #, +, - as your phone number.")
+        return
+
+    if not check_addition(data_ready[1], ALLOWED_NAME_CHARS):
+        bot.send_message(uid, "Error! You can only enter letters as your name.")
         return
 
     # now data might look like: ['24135135', 'Komron']
@@ -52,7 +68,21 @@ def list(message):
 
 @bot.message_handler(commands=['search'])
 def search(message):
-    demand = message.text.split()[1]
+    uid = message.chat.id
+
+    demand = message.text.split(maxsplit=1)[1]
+    results = database.search(user_id=uid, demand=demand)
+    # results look like: [('12345',), ('54321',), ...]
+
+    ready_results = f"Phones for {demand}:\n"
+
+    for element in results:
+        ready_results += "- " + element[0] + "\n"
+
+    ready_results = ready_results[:-1]
+    bot.send_message(uid, ready_results)
+
+
 
 
 bot.polling()
